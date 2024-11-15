@@ -10,7 +10,7 @@
       <div class="login-container">
         <ion-input placeholder="用户名" v-model="username"></ion-input>
         <ion-input placeholder="密码" type="password" v-model="password"></ion-input>
-        <ion-button color="tertiary" shape="round" @click="login">Tertiary</ion-button>
+        <ion-button color="tertiary" shape="round" @click="login">确认</ion-button>
       </div>
     </ion-content>
   </ion-page>

@@ -26,7 +26,7 @@
         <ion-item>
           <ion-input placeholder="授权码" v-model="authorizationCode" required></ion-input>
         </ion-item>
-        <ion-button expand="block" @click="register">注册</ion-button>
+        <ion-button color="tertiary" shape="round" @click="register">注册</ion-button>
       </div>
     </ion-content>
   </ion-page>
@@ -67,7 +67,10 @@ const register = async () => {
 
 <style scoped>
 .register-container {
-  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 35px;
 }
 
 </style>

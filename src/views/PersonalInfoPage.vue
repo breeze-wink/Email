@@ -48,7 +48,16 @@ import { ref, onMounted } from 'vue';
 import appClient from '@/services/api';
 
 const userStore = useUserStore();
-const user = ref(null);
+interface User {
+  username: string;
+  email: string;
+  pop3Server: string;
+  smtpServer: string;
+  pop3Port: number;
+  smtpPort: number;
+}
+
+const user = ref<User | null>(null);
 
 onMounted(async () => {
   try {
