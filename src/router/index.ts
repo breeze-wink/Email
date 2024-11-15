@@ -3,6 +3,7 @@ import { RouteRecordRaw } from 'vue-router';
 import TabsPage from '../views/TabsPage.vue';
 import LoginTabsPage from '../views/LoginTabsPage.vue';
 
+
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',

@@ -17,17 +17,19 @@
 </template>
 
 <script setup lang="ts">
+import { useUserStore } from '@/store/user';
 import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonInput, IonButton } from '@ionic/vue';
 import router from '@/router/index';
 import appClient from '@/services/api';
 import { ref } from 'vue';
-
+const userStore = useUserStore();
 const username = ref('');
 const password = ref('');
 
 const login = async () => {
   if (!username.value || !password.value) {
     alert('请输入用户名和密码');
+
     return;
   }
   try {
@@ -36,6 +38,9 @@ const login = async () => {
       password: password.value,
     });
     if (response.status === 200) {
+      const userId = response.data.id; // 假设 API 返回用户 ID
+      userStore.setUserId(userId); // 设置全局用户 ID
+      console.log(userStore.userId);
       router.push('/tabs/mailTab');
     }
   } catch (error : any) {

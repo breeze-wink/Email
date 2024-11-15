@@ -14,6 +14,7 @@
     "ionic:serve": "npm run dev -- --open"
   },
   "dependencies": {
+    "@babel/parser": "^7.26.2",
     "@capacitor/android": "6.1.2",
     "@capacitor/app": "latest",
     "@capacitor/core": "latest",
@@ -24,6 +25,7 @@
     "@ionic/vue-router": "^8.0.0",
     "axios": "^1.7.7",
     "ionicons": "^7.0.0",
+    "pinia": "^2.2.6",
     "vue": "^3.3.0",
     "vue-router": "^4.2.0"
   },

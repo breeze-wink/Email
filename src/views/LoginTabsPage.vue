@@ -1,7 +1,7 @@
 <template>
     <ion-page>
       <ion-tabs>
-        <ion-router-outlet></ion-router-outlet>
+        <ion-router-outlet :animated="false"></ion-router-outlet>
         <ion-tab-bar slot="bottom">
           <ion-tab-button tab="logintab" href="/loginTabs/login">
             <ion-icon :icon="triangle" />
