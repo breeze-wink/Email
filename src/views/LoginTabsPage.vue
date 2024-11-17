@@ -2,7 +2,7 @@
     <ion-page>
       <ion-tabs>
         <ion-router-outlet :animated="false"></ion-router-outlet>
-        <ion-tab-bar slot="bottom">
+        <ion-tab-bar slot="bottom" class="custom-bottom">
           <ion-tab-button tab="logintab" href="/loginTabs/login">
             <ion-icon :icon="logInOutline" />
             <ion-label>登陆</ion-label>
@@ -41,3 +41,8 @@
       },
     };
   </script>
+<style scoped>
+  .custom-bottom {
+  --background: #fff1eb 0%; 
+}
+</style>
