@@ -37,6 +37,13 @@
           <ion-text>{{ user.smtpPort }}</ion-text>
         </ion-item>
       </div>
+       <!-- 退出登录按钮 -->
+       <ion-button expand="full"  @click="logout" class="logout-button">
+        <ion-icon :icon="logOutOutline"></ion-icon>
+        退出登录
+      </ion-button>
+
+      
     </ion-content>
   </ion-page>
 </template>
@@ -46,8 +53,12 @@ import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonItem, IonLabel
 import { useUserStore } from '@/store/user';
 import { ref, onMounted } from 'vue';
 import appClient from '@/services/api';
+import { useRouter } from 'vue-router';
+import { logOutOutline } from 'ionicons/icons'; // 引入 log-out 图标
 
 const userStore = useUserStore();
+const router = useRouter();
+
 interface User {
   username: string;
   email: string;
@@ -70,10 +81,22 @@ onMounted(async () => {
     alert(error.response?.data?.message || '获取用户信息失败请重试。');
   }
 });
+
+// 退出登录函数
+const logout = () => {
+  userStore.$reset(); // 清空用户数据
+  router.push('/loginTabs/login'); // 跳转到登录页面
+};
+
 </script>
 
 <style scoped>
 .info-container {
   padding: 16px;
 }
+.logout-button {
+  padding: 16px;
+  --background: #828181; /* 覆盖 Ionic 的按钮背景色 */
+}
+
 </style>
