@@ -36,6 +36,7 @@
 import { ref } from 'vue';
 import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonItem, IonLabel, IonInput, IonButton } from '@ionic/vue';
 import appClient from '@/services/api';
+import router from '@/router';
 
 import { onMounted } from 'vue';
 
@@ -66,6 +67,7 @@ const register = async () => {
     });
     if (response.status === 201) {
       alert('注册成功');
+      router.push('/loginTabs/login')
     }
   } catch (error: any) {
     alert(`注册失败: ${error.response && error.response.data && error.response.data.message ? error.response.data.message : error.message}`);

@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from '@ionic/vue-router';
 import { RouteRecordRaw } from 'vue-router';
-import TabsPage from '../views/TabsPage.vue';
+import TabsPage from '../views/MailTabs.vue';
 import LoginTabsPage from '../views/LoginTabsPage.vue';
 
 
@@ -28,12 +28,12 @@ const routes: Array<RouteRecordRaw> = [
     ]
   },
   {
-    path: '/tabs/',
+    path: '/MailTabs/',
     component: TabsPage,
     children: [
       {
         path: '',
-        redirect: '/tabs/mailTab'
+        redirect: '/MailTabs/mailTab'
       },
       {
         path: 'mailTab',
