@@ -1,72 +1,78 @@
 <template>
-	<ion-page>
-		<ion-header>
-			<ion-toolbar>
-				<ion-title>发送邮件</ion-title>
-			</ion-toolbar>
-		</ion-header>
+  <ion-page>
+    <ion-header>
+      <ion-toolbar>
+        <ion-title>发送邮件</ion-title>
+      </ion-toolbar>
+    </ion-header>
 
-		<ion-content :fullscreen="true" class="ion-padding custom-content">
-			<!-- 收件人 -->
+    <ion-content :fullscreen="true" class="ion-padding custom-content">
+      <!-- 收件人 -->
+      <ion-input label="收件人" label-placement="floating" fill="solid" v-model="toAddress" type="email" 
+                 placeholder="请输入收件人邮箱" class="white-input">
+      </ion-input>
 
-			<ion-label position="stacked" class="transparent-label">收件人</ion-label>
-			<ion-input v-model="toAddress" type="email" placeholder="请输入收件人邮箱" class="white-input"></ion-input>
+      <!-- 主题 -->
+      <ion-input label="主题" label-placement="floating" fill="solid" v-model="subject" type="text" 
+                placeholder="请输入邮件主题" class="white-input">
+      </ion-input>
 
+      <!-- 正文 -->
+      <ion-textarea label="正文" label-placement="floating" :auto-grow="true"
+       v-model="content" fill="solid" placeholder="请输入邮件内容">
+      </ion-textarea>
 
-			<!-- 主题 -->
-
-			<ion-label position="stacked" class="transparent-label">主题</ion-label>
-			<ion-input v-model="subject" type="text" placeholder="请输入邮件主题" class="white-input"></ion-input>
-
-
-			<!-- 正文 -->
-
-			<ion-label position="stacked" class="transparent-label">正文</ion-label>
-			<ion-textarea v-model="content" placeholder="请输入邮件内容" class="white-textarea"></ion-textarea>
-
-
-			<!-- 附件选择框 -->
-			<div class="attachment-container">
-				<ion-label class="attachment-label">附件</ion-label>
-				<div class="attachment-box" style="border: none;" @click="handleFileClick">
+      <!-- 附件选择框 -->
+      <div class="attachment-container">
+        <ion-label class="attachment-label">附件</ion-label>
+        <div class="attachment-box" style="border: none;" @click="handleFileClick">
           <ion-icon :icon="attachOutline" size="large"></ion-icon>
         </div>
-				<input type="file" multiple ref="fileInput" @change="handleFileChange" style="display: none;" />
-			</div>
+        <input type="file" multiple ref="fileInput" @change="handleFileChange" style="display: none;" />
+      </div>
 
-			<!-- 附件名称列表 -->
-			<div class="attachment-list" v-if="attachments.length > 0">
-				<div v-for="(file, index) in attachments" :key="index" class="attachment-item">
-					<ion-icon :icon="documentOutline"></ion-icon>
-					<span class="attachment-name">{{ file.name }}</span>
-					<ion-icon :icon="closeCircleOutline" @click="removeAttachment(index)" class="remove-icon"></ion-icon>
-				</div>
-			</div>
+      <!-- 附件名称列表 -->
+      <div class="attachment-list" v-if="attachments.length > 0">
+        <div v-for="(file, index) in attachments" :key="index" class="attachment-item">
+          <ion-icon :icon="documentOutline"></ion-icon>
+          <span class="attachment-name">{{ file.name }}</span>
+          <ion-icon :icon="closeCircleOutline" @click="removeAttachment(index)" class="remove-icon"></ion-icon>
+        </div>
+      </div>
 
-			<!-- 发送按钮 -->
-			<ion-button id="sendButton" expand="full" color="primary" @click="sendMail" class="send-button">
-				<ion-icon slot="start" :icon ="sendOutline"></ion-icon>
-				 发送邮件
-			</ion-button>
-		</ion-content>
-	</ion-page>
+      <!-- 发送按钮 -->
+      <ion-button id="sendButton" expand="full" color="primary" @click="sendMail" class="send-button">
+        <ion-icon slot="start" :icon="sendOutline"></ion-icon>
+        发送邮件
+      </ion-button>
+
+      <!-- 加载动画 -->
+      <ion-loading
+        :is-open="isLoading"
+        :message="loadingMessage"
+        spinner="crescent"
+      ></ion-loading>
+    </ion-content>
+  </ion-page>
 </template>
+
 
 <script setup lang="ts">
 import {
-	IonPage,
-	IonHeader,
-	IonToolbar,
-	IonTitle,
-	IonContent,
-	IonItem,
+  IonPage,
+  IonHeader,
+  IonToolbar,
+  IonTitle,
+  IonContent,
+  IonItem,
   IonAlert,
   alertController,
-	IonLabel,
-	IonInput,
-	IonTextarea,
-	IonButton,
-	IonIcon,
+  IonLabel,
+  IonInput,
+  IonTextarea,
+  IonButton,
+  IonIcon,
+  IonLoading, // 引入加载动画组件
 } from '@ionic/vue';
 import { ref } from 'vue';
 import { useUserStore } from '@/store/user';
@@ -81,14 +87,18 @@ const content = ref('');
 const attachments = ref<File[]>([]);
 const fileInput = ref<HTMLInputElement | null>(null);
 
+// 定义加载动画状态变量
+const isLoading = ref(false);
+const loadingMessage = ref('正在发送邮件，请稍候...');
+
 // 使用用户存储
 const userStore = useUserStore();
 
 // 处理文件选择点击
 const handleFileClick = () => {
-	if (fileInput.value) {
-		fileInput.value.click();
-	}
+  if (fileInput.value) {
+    fileInput.value.click();
+  }
 };
 
 // 处理文件选择
@@ -102,24 +112,22 @@ const handleFileChange = (event: Event) => {
 
 // 移除附件
 const removeAttachment = (index: number) => {
-	attachments.value.splice(index, 1); // 从附件列表中移除指定索引的附件
+  attachments.value.splice(index, 1); // 从附件列表中移除指定索引的附件
 };
-
 
 // 发送邮件
 const sendMail = async () => {
-	if (!toAddress.value || !subject.value || !content.value) {
+  if (!toAddress.value || !subject.value || !content.value) {
     const alert = await alertController.create({
       header: '警告',
-      
       message: '输入内容不能为空',
-      buttons: ['确认']
+      buttons: ['确认'],
     });
-    
-		await alert.present();
-		return;
-	}
-  
+
+    await alert.present();
+    return;
+  }
+
   const sendConfirm = await alertController.create({
     header: '是否发送',
     buttons: [
@@ -133,6 +141,9 @@ const sendMail = async () => {
         role: 'confirm',
         cssClass: 'alert-button-confirm',
         handler: async () => {
+          // 显示加载动画
+          isLoading.value = true;
+
           // 创建表单数据
           const formData = new FormData();
           formData.append('userId', userStore.userId as string);
@@ -146,17 +157,13 @@ const sendMail = async () => {
 
           try {
             // 异步发送邮件
-            const response = await apiFormDataClient.post('/api/mail/send', formData, {
-              headers: {
-                'Content-Type': 'multipart/form-data',
-              },
-            });
+            const response = await apiFormDataClient.post('/api/mail/send', formData);
 
             // 成功后的提示框
             const successAlert = await alertController.create({
               header: '成功',
               message: response.data.message || '邮件发送成功！',
-              buttons: ['确认']
+              buttons: ['确认'],
             });
             await successAlert.present();
           } catch (error) {
@@ -164,24 +171,23 @@ const sendMail = async () => {
             const errorAlert = await alertController.create({
               header: '发送失败',
               message: '发送邮件失败，请稍后重试',
-              buttons: ['确认']
+              buttons: ['确认'],
             });
             await errorAlert.present();
             console.error('发送邮件失败:', error);
+          } finally {
+            // 关闭加载动画
+            isLoading.value = false;
           }
-        }
-      }
+        },
+      },
     ],
   });
 
-await sendConfirm.present();
-
-
+  await sendConfirm.present();
 };
-
-
-
 </script>
+
 
 <style >
 .custom-content {
@@ -198,19 +204,11 @@ await sendConfirm.present();
 	background: transparent;
 }
 
-.white-input,
-.white-textarea {
-	background: #f0f0f0;
-	border-radius: 5px;
+.white-input {
 	margin-top: 10px;
 	margin-bottom: 20px;
 	/* 输入框与下一个元素的间距 */
-	padding: 10px;
-}
-
-.white-textarea {
-	height: 200px;
-	/* 增加高度 */
+	padding: 0px;
 }
 
 .attachment-container {

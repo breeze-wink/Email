@@ -1,7 +1,7 @@
 <template>
   <ion-page>
     <ion-header>
-      <ion-toolbar>
+      <ion-toolbar color="dark">
         <ion-title>收件箱</ion-title>
       </ion-toolbar>
     </ion-header>
@@ -32,6 +32,7 @@
 import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonLabel, IonIcon, IonInfiniteScroll, IonInfiniteScrollContent } from '@ionic/vue';
 import { ref, onMounted } from 'vue';
 import { mailOpenOutline, mailUnreadOutline } from 'ionicons/icons';
+import router from '@/router';
 import apiClient from '@/services/api';
 import { useUserStore } from '@/store/user';
 
@@ -71,7 +72,8 @@ const loadMore = async (event: Event) => {
 };
 
 const openMail = (mailId: number) => {
-  console.log('Open mail with ID:', mailId);
+  userStore.setMailId(mailId);
+  router.push(`/MailTabs/mailDetail`);
 };
 
 const formatDate = (dateString: string) => {

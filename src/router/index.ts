@@ -40,6 +40,10 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('@/views/MailPage.vue')
       },
       {
+        path: 'mailDetail',
+        component: () => import('@/views/MailDetailPage.vue')
+      },
+      {
         path: 'sendMailTab',
         component: () => import('@/views/SendMailPage.vue')
       },
