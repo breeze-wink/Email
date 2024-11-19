@@ -2,23 +2,28 @@
   <ion-page>
     <ion-header>
       <ion-toolbar color="dark">
+        <ion-buttons slot="start">
+        <ion-back-button :icon="arrowBackCircleOutline" default-href="/MailTabs/categorizeTab" text="返回"></ion-back-button>
+        </ion-buttons>
         <ion-title>收件箱</ion-title>
       </ion-toolbar>
     </ion-header>
     <ion-content :fullscreen="true">
       <ion-header collapse="condense">
-        <ion-toolbar>
-          <ion-title size="large">收件箱</ion-title>
-        </ion-toolbar>
+        
       </ion-header>
       <ion-list>
-        <ion-item v-for="mail in mails" :key="mail.id" @click="openMail(mail.id)">
+        <ion-item v-for="mail in mails" :key="mail.id" @click="openMail(mail)">
           <ion-label>
             <h2>{{ mail.subject }}</h2>
             <p>{{ mail.fromAddress }}</p>
             <p>{{ formatDate(mail.sentTime) }}</p>
           </ion-label>
-          <ion-icon :icon="mail.isRead ? mailOpenOutline : mailUnreadOutline" slot="start"></ion-icon>
+          <ion-icon 
+            :icon="mail.isRead ? mailOpenOutline : mailUnreadOutline" 
+            slot="start"
+            :style="{ color: mail.isRead ? 'blue' : 'red' }">
+          </ion-icon>
         </ion-item>
       </ion-list>
       <ion-infinite-scroll @ionInfinite="loadMore">
@@ -29,9 +34,9 @@
 </template>
 
 <script setup lang="ts">
-import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonLabel, IonIcon, IonInfiniteScroll, IonInfiniteScrollContent } from '@ionic/vue';
+import { IonButtons, IonBackButton, IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonLabel, IonIcon, IonInfiniteScroll, IonInfiniteScrollContent } from '@ionic/vue';
 import { ref, onMounted } from 'vue';
-import { mailOpenOutline, mailUnreadOutline } from 'ionicons/icons';
+import { arrowBackCircleOutline, mailOpenOutline, mailUnreadOutline } from 'ionicons/icons';
 import router from '@/router';
 import apiClient from '@/services/api';
 import { useUserStore } from '@/store/user';
@@ -71,9 +76,15 @@ const loadMore = async (event: Event) => {
   (event.target as HTMLIonInfiniteScrollElement).complete();
 };
 
-const openMail = (mailId: number) => {
-  userStore.setMailId(mailId);
+const openMail = (mail : Mail) => {
+ 
+  
+  userStore.setMailId(mail.id);
   router.push(`/MailTabs/mailDetail`);
+  if(!mail.isRead){
+    mail.isRead = !mail.isRead;
+
+  }
 };
 
 const formatDate = (dateString: string) => {

@@ -50,7 +50,7 @@ const login = async () => {
       const userId = response.data.id; // 假设 API 返回用户 ID
       userStore.setUserId(userId); // 设置全局用户 ID
       console.log(userStore.userId);
-      router.push('/MailTabs/mailTab');
+      router.push('/MailTabs/categorizeTab');
     }
   } catch (error: any) {
     console.error('登录失败', error);

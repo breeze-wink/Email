@@ -3,7 +3,6 @@ import { RouteRecordRaw } from 'vue-router';
 import TabsPage from '../views/MailTabs.vue';
 import LoginTabsPage from '../views/LoginTabsPage.vue';
 
-
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
@@ -33,7 +32,11 @@ const routes: Array<RouteRecordRaw> = [
     children: [
       {
         path: '',
-        redirect: '/MailTabs/mailTab'
+        redirect: '/MailTabs/categorizeTab'
+      },
+      {
+        path: 'categorizeTab',
+        component: () => import('@/views/Categorize.vue')
       },
       {
         path: 'mailTab',

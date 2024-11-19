@@ -100,6 +100,7 @@ const router = useRouter();
         text: 'OK',
         handler: async (data: any) => {
             const { oldPassword, newPassword, confirmPassword } = data;
+            console.log(oldPassword);
 
             // 验证输入是否为空
             if (!oldPassword || !newPassword || !confirmPassword) {

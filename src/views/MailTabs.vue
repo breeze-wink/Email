@@ -3,17 +3,17 @@
     <ion-tabs>
       <ion-router-outlet></ion-router-outlet>
       <ion-tab-bar slot="bottom">
-        <ion-tab-button tab="mailTab" href="/Mailtabs/mailTab">
+        <ion-tab-button tab="categorizeTab" href="/MailTabs/categorizeTab">
           <ion-icon :icon="mailOutline" />
-          <ion-label>收件箱</ion-label>
+          <ion-label>信箱</ion-label>
         </ion-tab-button>
 
-        <ion-tab-button tab="sendMailTab" href="/Mailtabs/sendMailTab">
+        <ion-tab-button tab="sendMailTab" href="/MailTabs/sendMailTab">
           <ion-icon :icon="sendOutline" />
           <ion-label>发送邮件</ion-label>
         </ion-tab-button>
 
-        <ion-tab-button tab="PersonalInfoTab" href="/Mailtabs/PersonalInfoTab">
+        <ion-tab-button tab="PersonalInfoTab" href="/MailTabs/PersonalInfoTab">
           <ion-icon :icon="personCircleOutline" />
           <ion-label>个人信息</ion-label>
         </ion-tab-button>
