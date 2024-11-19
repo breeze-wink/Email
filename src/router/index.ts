@@ -47,6 +47,38 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('@/views/MailDetailPage.vue')
       },
       {
+        path: 'drafts',
+        component: () => import('@/views/DraftsPage.vue')
+      },
+      {
+        path: 'draftsDetail',
+        component: () => import('@/views/DraftsDetailPage.vue')
+      },
+      {
+        path: 'trash',
+        component: () => import('@/views/TrashPage.vue')
+      },
+      {
+        path: 'trashDetail',
+        component: () => import('@/views/TrashDetailPage.vue')
+      },
+      {
+        path: 'outbox',
+        component: () => import('@/views/OutboxPage.vue')
+      },
+      {
+        path: 'outboxDetail',
+        component: () => import('@/views/OutboxDetailPage.vue')
+      },
+
+
+
+
+
+
+
+
+      {
         path: 'sendMailTab',
         component: () => import('@/views/SendMailPage.vue')
       },
