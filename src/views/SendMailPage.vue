@@ -1,7 +1,7 @@
 <template>
   <ion-page>
     <ion-header>
-      <ion-toolbar>
+      <ion-toolbar color="dark">
         <ion-title>发送邮件</ion-title>
       </ion-toolbar>
     </ion-header>
