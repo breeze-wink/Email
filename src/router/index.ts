@@ -50,10 +50,7 @@ const routes: Array<RouteRecordRaw> = [
         path: 'drafts',
         component: () => import('@/views/DraftsPage.vue')
       },
-      {
-        path: 'draftsDetail',
-        component: () => import('@/views/DraftsDetailPage.vue')
-      },
+    
       {
         path: 'trash',
         component: () => import('@/views/TrashPage.vue')
@@ -70,13 +67,6 @@ const routes: Array<RouteRecordRaw> = [
         path: 'outboxDetail',
         component: () => import('@/views/OutboxDetailPage.vue')
       },
-
-
-
-
-
-
-
 
       {
         path: 'sendMailTab',

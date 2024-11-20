@@ -45,7 +45,11 @@
           <ion-spinner></ion-spinner>
           <p>加载中...</p>
         </div>
-      </ion-content>
+        <ion-button expand="block" color="danger" @click="deleteMail" class="click-button">
+        <ion-icon :icon="trashOutline"></ion-icon>
+          删除邮件
+        </ion-button>
+        </ion-content>
     </ion-page>
   </template>
   
@@ -55,7 +59,7 @@
   import apiClient from '@/services/api';
   import { useRouter } from 'vue-router';
   import { useUserStore } from '@/store/user';
-import { arrowBackCircleOutline, documentOutline, downloadOutline } from 'ionicons/icons';
+import {trashOutline, arrowBackCircleOutline, documentOutline, downloadOutline } from 'ionicons/icons';
   
   interface Mail {
     id: number;
@@ -86,7 +90,15 @@ import { arrowBackCircleOutline, documentOutline, downloadOutline } from 'ionico
       console.error('Failed to fetch outbox mail details:', error);
     }
   };
-  
+  const deleteMail = async () => {
+  try {
+    const mailId = userStore.mailId;
+    await apiClient.delete(`/api/mail/${mailId}`);
+    router.push('/MailTabs/outbox');
+  } catch (error) {
+    console.error('Failed to delete mail:', error);
+  }
+};
   const downloadAttachment = (attachment: { fileName: string; fileType: string; fileData: string }) => {
     const byteCharacters = atob(attachment.fileData);
     const byteNumbers = new Array(byteCharacters.length);
@@ -140,5 +152,9 @@ import { arrowBackCircleOutline, documentOutline, downloadOutline } from 'ionico
   ion-button {
     --border-radius: 12px;
   }
-  </style>
+  .click-button {
+  margin-top: 20px;
+  margin-bottom: 40px;
+}
+</style>
   

@@ -46,13 +46,9 @@
           <p>加载中...</p>
         </div>
       </ion-content>
-      <ion-footer>
-        <ion-toolbar>
-          <ion-button expand="block" color="danger" @click="deleteMail">
+      <ion-button expand="block" color="danger" @click="deleteMail" class="click-button">
             删除邮件
-          </ion-button>
-        </ion-toolbar>
-      </ion-footer>
+      </ion-button>
     </ion-page>
   </template>
   
@@ -156,6 +152,10 @@ import { arrowBackCircleOutline, documentOutline, downloadOutline } from 'ionico
   }
   ion-button {
     --border-radius: 12px;
+  }
+  .click-button {
+  margin-top: 20px;
+  margin-bottom: 40px;
   }
   </style>
   

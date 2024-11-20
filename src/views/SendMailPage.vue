@@ -2,7 +2,7 @@
   <ion-page>
     <ion-header>
       <ion-toolbar color="dark">
-        <ion-title>发送邮件</ion-title>
+        <ion-title>{{ isDraft ? '草稿邮件详情' : '发送邮件' }}</ion-title>
       </ion-toolbar>
     </ion-header>
 
@@ -40,10 +40,18 @@
         </div>
       </div>
 
-      <!-- 发送按钮 -->
-      <ion-button id="sendButton" expand="full" color="primary" @click="sendMail" class="send-button">
+      <!-- 发送/保存按钮 -->
+      <ion-button id="sendButton" expand="block" color="primary" @click="sendMail" class="send-button">
         <ion-icon slot="start" :icon="sendOutline"></ion-icon>
         发送邮件
+      </ion-button>
+      <ion-button id="saveButton" expand="block" color="medium" @click="saveDraft" class="send-button">
+        <ion-icon slot="start" :icon="saveOutline"></ion-icon>
+        保存草稿
+      </ion-button>
+      <ion-button v-if="isDraft" expand="block" color="danger" @click="deleteMail" class="send-button">
+      <ion-icon :icon="trashOutline"></ion-icon>
+        删除草稿
       </ion-button>
 
       <!-- 加载动画 -->
@@ -73,11 +81,13 @@ import {
   IonIcon,
   IonLoading,
 } from '@ionic/vue';
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useUserStore } from '@/store/user';
-import axios from 'axios';
+import {onIonViewWillEnter} from '@ionic/vue';
+import apiClient from '@/services/api';
 import { apiFormDataClient } from '@/services/api';
-import { sendOutline, closeCircleOutline, documentOutline, attachOutline } from 'ionicons/icons';
+import { trashOutline,sendOutline, closeCircleOutline, documentOutline, attachOutline, saveOutline } from 'ionicons/icons';
+import { useRouter, useRoute } from 'vue-router';
 
 // 定义状态变量
 const toAddress = ref('');
@@ -85,6 +95,8 @@ const subject = ref('');
 const content = ref('');
 const attachments = ref<File[]>([]);
 const fileInput = ref<HTMLInputElement | null>(null);
+const isDraft = ref(false);
+const mailId = ref<string | null>(null);
 
 // 定义加载动画状态变量
 const isLoading = ref(false);
@@ -92,6 +104,8 @@ const loadingMessage = ref('正在发送邮件，请稍候...');
 
 // 使用用户存储
 const userStore = useUserStore();
+const router = useRouter();
+const route = useRoute();
 
 // 处理文件选择点击
 const handleFileClick = () => {
@@ -130,18 +144,29 @@ const sendMail = async () => {
   // 显示加载动画
   isLoading.value = true;
 
-  // 设置定时器，在2秒后关闭加载动画并显示成功提示框
   setTimeout(async () => {
-    isLoading.value = false;
+  isLoading.value = false;
 
-    // 显示成功提示框
-    const successAlert = await alertController.create({
-      header: '成功',
-      message: '邮件已发送！',
-      buttons: ['确认'],
-    });
-    await successAlert.present();
-  }, 2000);
+  // 显示成功提示框
+  const successAlert = await alertController.create({
+    header: '成功',
+    message: '邮件已发送！',
+    buttons: ['确认'],
+  });
+  await successAlert.present();
+
+  // 清空 URL 查询参数
+  router.replace({ path: '/MailTabs/sendMailTab' });
+
+  // 清空输入框和附件列表
+  toAddress.value = '';
+  subject.value = '';
+  content.value = '';
+  attachments.value = [];
+  isDraft.value = false;
+  mailId.value = null;
+}, 2000);
+
 
   // 创建表单数据
   const formData = new FormData();
@@ -155,12 +180,87 @@ const sendMail = async () => {
   });
 
   try {
+    // 如果是草稿，则删除草稿
+    if (isDraft.value && mailId.value) {
+      await apiClient.delete(`/api/mail/${mailId.value}`);
+    }
     // 异步发送邮件
     await apiFormDataClient.post('/api/mail/send', formData);
   } catch (error) {
     console.error('发送邮件失败:', error);
   }
 };
+const deleteMail = async () => {
+  try {
+    const mailId = userStore.mailId;
+    await apiClient.delete(`/api/mail/${mailId}`);
+    router.push('/MailTabs/drafts');
+  } catch (error) {
+    console.error('Failed to delete mail:', error);
+  }
+};
+// 保存草稿
+const saveDraft = async () => {
+  if (!subject.value && !content.value) {
+    const alert = await alertController.create({
+      header: '警告',
+      message: '草稿内容不能为空',
+      buttons: ['确认'],
+    });
+
+    await alert.present();
+    return;
+  }
+
+  // 创建表单数据
+  const formData = new FormData();
+  formData.append('userId', userStore.userId as string);
+  formData.append('toAddress', toAddress.value);
+  formData.append('subject', subject.value);
+  formData.append('content', content.value);
+  if (mailId.value) {
+    formData.append('mailId', mailId.value);
+  }
+
+  attachments.value.forEach((file) => {
+    formData.append('attachments', file);
+  });
+
+  try {
+    // 异步保存草稿
+    await apiFormDataClient.post('/api/mail/save', formData);
+    const successAlert = await alertController.create({
+      header: '成功',
+      message: '草稿已保存！',
+      buttons: ['确认'],
+    });
+  
+    await successAlert.present();
+  } catch (error) {
+    console.error('保存草稿失败:', error);
+  }
+};
+
+// 页面挂载时检查是否有草稿信息需要填充
+onIonViewWillEnter(async () => {
+  mailId.value = route.query.mailId as string || null;
+  if (mailId.value) {
+    try {
+      const response = await apiClient.get(`/api/mail/${mailId.value}`);
+      const draftMail = response.data;
+      toAddress.value = draftMail.toAddress;
+      subject.value = draftMail.subject;
+      content.value = draftMail.content;
+      attachments.value = draftMail.attachments.map((attachment: { fileName: string; fileType: string; fileData: string }) => {
+        return new File([new Uint8Array(atob(attachment.fileData).split('').map(c => c.charCodeAt(0)))], attachment.fileName, { type: attachment.fileType });
+      });
+      isDraft.value = true;
+    } catch (error) {
+      console.error('Failed to fetch draft details:', error);
+    }
+  }
+  
+});
 </script>
 
 <style >
