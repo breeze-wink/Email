@@ -8,9 +8,12 @@
                     <ion-label>信箱</ion-label>
                 </ion-tab-button>
 
-                <ion-tab-button tab="sendMailTab" href="/MailTabs/sendMailTab">
+                <ion-tab-button 
+                tab="sendMailTab" 
+                href="/MailTabs/sendMailTab"
+                :disabled="userStore.send_permission === 0">
                     <ion-icon :icon="sendOutline" />
-                    <ion-label>发送邮件</ion-label>
+                    <ion-label>{{ userStore.send_permission === 0 ? '发送邮件（禁用）' : '发送邮件' }}</ion-label>
                 </ion-tab-button>
 
                 <ion-tab-button tab="friendsTab" href="/MailTabs/FriendsTab">
@@ -35,6 +38,7 @@
 <script lang="ts">
 import { IonTabBar, IonTabButton, IonTabs, IonLabel, IonIcon, IonPage, IonRouterOutlet } from '@ionic/vue';
 import { mailOutline, peopleCircleOutline, personCircleOutline, sendOutline } from 'ionicons/icons';
+import { useUserStore } from '@/store/user';
 
 export default {
     name: 'Tabs',
@@ -48,11 +52,13 @@ export default {
         IonRouterOutlet,
     },
     setup() {
+        const userStore = useUserStore();
         return {
             mailOutline,
             sendOutline,
             personCircleOutline,
-            peopleCircleOutline
+            peopleCircleOutline,
+            userStore
         };
     },
 };

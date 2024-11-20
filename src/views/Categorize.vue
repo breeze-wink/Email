@@ -17,11 +17,13 @@
         <ion-row class="center-content">
           <!-- 草稿箱 -->
           <ion-col size="6">
-            <ion-card color="light" @click="navigateTo('drafts')">
+            <ion-card color="light" 
+             :class="{ 'disabled-card': userStore.send_permission === 0 }"
+            @click="userStore.send_permission !== 0 ? navigateTo('drafts') : null">
               <ion-card-header>
                 <ion-card-title>
                   <ion-icon :icon="documentOutline"></ion-icon>
-                  草稿箱
+                  <ion-label>{{ userStore.send_permission === 0 ? '草稿箱（禁用）' : '草稿箱' }}</ion-label>
                 </ion-card-title>
               </ion-card-header>
             </ion-card>
@@ -29,11 +31,13 @@
 
           <!-- 收件箱 -->
           <ion-col size="6">
-            <ion-card color="tertiary" @click="navigateTo('mailTab')">
+            <ion-card color="tertiary"
+            :class="{ 'disabled-card': userStore.receive_permission === 0 }"
+            @click="userStore.receive_permission !== 0 ? navigateTo('mailTab') : null">
               <ion-card-header>
                 <ion-card-title>
                   <ion-icon :icon="mailUnreadOutline"></ion-icon>
-                  收件箱
+                  <ion-label>{{ userStore.receive_permission === 0 ? '收件箱（禁用）' : '收件箱' }}</ion-label>
                 </ion-card-title>
               </ion-card-header>
             </ion-card>
@@ -92,8 +96,10 @@ import {
   trashOutline,
   sendOutline,
 } from 'ionicons/icons';
+import { useUserStore } from '@/store/user';
 
 const router = useRouter();
+const userStore = useUserStore();
 
 // 导航函数，用于跳转到不同的邮箱界面
 const navigateTo = (folder: string) => {
@@ -134,6 +140,11 @@ ion-card-title {
   gap: 10px;
 }
 
+
+.disabled-card {
+  pointer-events: none;
+  opacity: 0.5;
+}
 ion-icon {
   font-size: 2em;
 }

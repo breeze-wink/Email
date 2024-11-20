@@ -48,7 +48,13 @@ const login = async () => {
     });
     if (response.status === 200) {
       const userId = response.data.id; // 假设 API 返回用户 ID
+      const receive_permission =response.data.permission >> 1;
+      const send_permission =response.data.permission & 1;
       userStore.setUserId(userId); // 设置全局用户 ID
+      userStore.setReceivePermission(receive_permission);
+      userStore.setSendPermission(send_permission);
+      console.log(receive_permission,send_permission);
+     
       console.log(userStore.userId);
       router.push('/MailTabs/categorizeTab');
     }
