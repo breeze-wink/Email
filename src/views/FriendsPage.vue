@@ -19,7 +19,7 @@
             </ion-header>
             
 
-            <ion-list>
+            <ion-list :inset="true" style="background-color: transparent;">
                 <ion-item v-for="friend in friends" :key="friend.friendId">
                     <ion-label>
                         <h2>{{ friend.friendName }}</h2>

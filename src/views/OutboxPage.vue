@@ -9,7 +9,7 @@
         </ion-toolbar>
       </ion-header>
       <ion-content :fullscreen="true">
-        <ion-list>
+        <ion-list  :inset="true" style="background-color: transparent;">
           <ion-item v-for="mail in mails" :key="mail.id" @click="openMail(mail)">
             <ion-label>
               <h2>{{ mail.subject }}</h2>

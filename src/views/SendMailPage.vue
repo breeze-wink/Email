@@ -2,6 +2,7 @@
   <ion-page>
     <ion-header>
       <ion-toolbar color="dark">
+        <ion-back-button slot="start" v-if="isDraft" :icon="arrowBackCircleOutline" default-href="/MailTabs/drafts" text="返回"></ion-back-button>
         <ion-title>{{ isDraft ? '草稿邮件详情' : '发送邮件' }}</ion-title>
       </ion-toolbar>
     </ion-header>
@@ -78,6 +79,7 @@ import {
   IonInput,
   IonTextarea,
   IonButton,
+  IonBackButton,
   IonIcon,
   IonLoading,
 } from '@ionic/vue';
@@ -86,7 +88,7 @@ import { useUserStore } from '@/store/user';
 import {onIonViewWillEnter} from '@ionic/vue';
 import apiClient from '@/services/api';
 import { apiFormDataClient } from '@/services/api';
-import { trashOutline,sendOutline, closeCircleOutline, documentOutline, attachOutline, saveOutline } from 'ionicons/icons';
+import {arrowBackCircleOutline, trashOutline,sendOutline, closeCircleOutline, documentOutline, attachOutline, saveOutline } from 'ionicons/icons';
 import { useRouter, useRoute } from 'vue-router';
 
 // 定义状态变量
