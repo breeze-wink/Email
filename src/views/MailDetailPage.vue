@@ -114,7 +114,7 @@ const deleteMail = async () => {
   try {
     const mailId = userStore.mailId;
     await apiClient.delete(`/api/mail/${mailId}`);
-    router.push('/MailTabs/mailTab');
+    router.replace('/MailTabs/mailTab');
   } catch (error) {
     console.error('Failed to delete mail:', error);
   }

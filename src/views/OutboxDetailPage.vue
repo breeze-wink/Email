@@ -94,7 +94,7 @@ import {trashOutline, arrowBackCircleOutline, documentOutline, downloadOutline }
   try {
     const mailId = userStore.mailId;
     await apiClient.delete(`/api/mail/${mailId}`);
-    router.push('/MailTabs/outbox');
+    router.replace('/MailTabs/outbox');
   } catch (error) {
     console.error('Failed to delete mail:', error);
   }

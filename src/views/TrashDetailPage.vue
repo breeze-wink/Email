@@ -94,7 +94,7 @@ import { arrowBackCircleOutline, documentOutline, downloadOutline } from 'ionico
   try {
     const mailId = userStore.mailId;
     await apiClient.delete(`/api/mail/${mailId}`);
-    router.push('/MailTabs/trash');
+    router.replace('/MailTabs/trash');
   } catch (error) {
     console.error('Failed to delete mail:', error);
   }
