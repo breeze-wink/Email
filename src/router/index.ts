@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from '@ionic/vue-router';
 import { RouteRecordRaw } from 'vue-router';
 import TabsPage from '../views/MailTabs.vue';
 import LoginTabsPage from '../views/LoginTabsPage.vue';
+import AdminTabsPage from '../views/AdminTabs.vue' ;
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -91,6 +92,39 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('@/views/AddFriendPage.vue')
 
       }
+    ]
+  },
+  {
+    path: '/AdminTabs/',
+    component: AdminTabsPage,
+    children: [
+      {
+        path: '',
+        redirect: '/AdminTabs/setting'
+      },
+      {
+        path: 'outbox',
+        component: () => import('@/views/AdminOutboxPage.vue')
+      },
+      {
+        path: 'sendMail',
+        component: () => import('@/views/AdminSendPage.vue')
+      },
+      {
+        path: 'users',
+        component: () => import('@/views/AdminUsersPage.vue')
+      },
+      {
+        path: 'setting',
+        component: () => import('@/views/AdminSettingPage.vue')
+      },
+      {
+        path: 'userDetail/:detailId',
+       
+        component: () => import('@/views/UserDetailPage.vue')
+      }
+    
+    
     ]
   }
 ];
