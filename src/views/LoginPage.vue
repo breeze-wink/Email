@@ -56,7 +56,12 @@ const login = async () => {
       console.log(receive_permission,send_permission);
      
       console.log(userStore.userId);
-      router.push('/MailTabs/categorizeTab');
+      if(userStore.userId == '0'){
+        router.push('/AdminTabs/setting');
+      }else{
+        router.push('/MailTabs/categorizeTab');
+      }
+      
     }
   } catch (error: any) {
     console.error('登录失败', error);
