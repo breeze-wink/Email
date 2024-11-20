@@ -26,7 +26,7 @@
               <p>{{ user.email }}</p>
             </ion-label>
               <ion-button @click="viewUserDetail(user.id)" color="primary" slot="end">详情</ion-button>
-              <ion-button @click="adjustUserPermissions(user.id)" color="tertiary" slot="end">调整权限</ion-button>
+              <ion-button @click="adjustUserPermissions(user.id, user.username)" color="tertiary" slot="end">调整权限</ion-button>
               <ion-button @click="deleteUser(user.id)" color="danger" slot="end">删除用户</ion-button>
   
           </ion-item>
@@ -52,6 +52,8 @@
   import apiClient from '@/services/api';
   import { alertController } from '@ionic/vue';
   import { useRouter } from 'vue-router';
+
+
 
 
   
@@ -98,7 +100,6 @@
       console.error('搜索用户失败', error);
       await showAlert('错误', (error as any).response?.data?.message || '搜索用户失败，请重试。');
 
-
     }
   };
   
@@ -109,17 +110,64 @@
 
   const viewUserDetail = (userId: string) => {
     console.log(userId);
-  router.push({
-    path: '/AdminTabs/userDetail',
-    query: { detailId: userId }
+    router.push({
+    path: `/AdminTabs/userDetail/${userId}`
 
   });
 };
 
 // 调整权限函数（可以按需实现逻辑）
-const adjustUserPermissions = async (userId: string) => {
-  // 这里可以调用一个 API 或者显示弹窗调整权限的逻辑
-  await showAlert('调整权限', `正在调整用户 ${userId} 的权限。`);
+// 调整权限函数
+const adjustUserPermissions = async (userId: string, username: string) => {
+    let permission = 0;
+    const alert = await alertController.create({
+      header: '调整权限',
+      message: `用户名: ${username}`,
+      inputs: [
+        {
+          name: 'sendPermission',
+          type: 'checkbox',
+          label: '发件',
+          value: 'send',
+        },
+        {
+          name: 'receivePermission',
+          type: 'checkbox',
+          label: '收件',
+          value: 'receive',
+        },
+      ],
+      buttons: [
+        {
+          text: '取消',
+          role: 'cancel',
+        },
+        {
+          text: '确认',
+          handler: async (data: any) => {
+            if (data.includes('send')) {
+              permission += 1;
+            }
+            if (data.includes('receive')) {
+              permission += 2;
+            }
+            try {
+              const response = await apiClient.put('/api/administrator/update-permission', {
+                id: userId,
+                permission: permission,
+              });
+              if (response.status === 200) {
+                await showAlert('成功', '权限更新成功！');
+              }
+            } catch (error: any) {
+              console.error('更新用户权限失败', error);
+              await showAlert('错误', error.response?.data?.message || '更新用户权限失败，请重试。');
+            }
+          },
+        },
+      ],
+    });
+    await alert.present();
 };
 
 // 删除用户函数
