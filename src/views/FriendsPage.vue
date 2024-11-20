@@ -1,30 +1,28 @@
 <template>
     <ion-page>
-        <ion-header style="margin-bottom: 0;">
+        <ion-header>
             <ion-toolbar color="dark">
                 <ion-title>好友列表</ion-title>
-                <ion-buttons slot="end" @click="navigateToAddFriend">
-                    <ion-button color="light">
-                        <ion-icon :icon="addOutline" color="light" @click="navigateToAddFriend"></ion-icon>
+                <ion-buttons slot="end">
+                    <ion-button color="light" @click="presentAddFriendAlert">
+                        <ion-icon :icon="addOutline" color="light"></ion-icon>
                     </ion-button>
                 </ion-buttons>
-                        
-                   
             </ion-toolbar>
         </ion-header>
 
         <ion-content :fullscreen="true">
             <ion-header collapse="condense">
                 <ion-toolbar>
-                    <ion-title size="large">个人信息</ion-title>
+                    <ion-title size="large">好友列表</ion-title>
                 </ion-toolbar>
             </ion-header>
 
             <ion-list>
-                <ion-item v-for="friend in friends" :key="friend.id">
+                <ion-item v-for="friend in friends" :key="friend.friendId">
                     <ion-label>
-                        <h2>{{ friend.nickname }}</h2>
-                        <p>{{ friend.email }}</p>
+                        <h2>{{ friend.friendName }}</h2>
+                        <p>{{ friend.friendEmail }}</p>
                     </ion-label>
                     <ion-icon :icon="sendOutline" slot="end"></ion-icon>
                 </ion-item>
@@ -34,26 +32,39 @@
 </template>
 
 <script setup lang="ts">
-import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonLabel, IonIcon, alertController,IonButtons,IonButton } from '@ionic/vue';
+import {
+    IonPage,
+    IonHeader,
+    IonToolbar,
+    IonTitle,
+    IonContent,
+    IonList,
+    IonItem,
+    IonLabel,
+    IonIcon,
+    alertController,
+    IonButtons,
+    IonButton
+} from '@ionic/vue';
 import { ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
-import { addOutline, searchOutline, sendOutline } from 'ionicons/icons';
+import { addOutline, sendOutline } from 'ionicons/icons';
 import appClient from '@/services/api';
 import { useUserStore } from '@/store/user';
 
 interface Friend {
-    id: number;
-    nickname: string;
-    email: string;
+    friendId: number;
+    friendName: string;
+    friendEmail: string;
 }
 
 const friends = ref<Friend[]>([]);
 const userStore = useUserStore();
-const router = useRouter();
+const searchResult = ref<{ userId: number; nickname: string } | null>(null);
 
+// 获取好友列表
 onMounted(async () => {
     try {
-        const response = await appClient.get('/api/friends', { params: { userId: userStore.userId } });
+        const response = await appClient.get('/api/user/friends', { params: { userId: userStore.userId } });
         if (response.status === 200) {
             friends.value = response.data;
         }
@@ -63,9 +74,104 @@ onMounted(async () => {
     }
 });
 
+// 显示添加好友弹窗
+const presentAddFriendAlert = async () => {
+    const alert = await alertController.create({
+        header: '添加好友',
+        inputs: [
+            {
+                name: 'email',
+                type: 'text',
+                placeholder: '输入好友邮箱地址',
+            },
+        ],
+        buttons: [
+            {
+                text: '取消',
+                role: 'cancel',
+            },
+            {
+                text: '搜索',
+                handler: async (data: any) => {
+                    const email = data.email;
+                    if (!email) {
+                        await showAlert('提示', '请输入好友邮箱地址');
+                        return false;
+                    }
+                    await searchFriend(email);
+                },
+            },
+        ],
+    });
+    await alert.present();
+};
 
-const navigateToAddFriend = () => {
-    router.push('/MailTabs/addFriend');
+// 搜索好友函数
+const searchFriend = async (email: string) => {
+    try {
+        const response = await appClient.get(`/api/user/search`, {
+            params: { email: email }
+        });
+
+        if (response.status === 200 && response.data.userId) {
+            searchResult.value = {
+                userId: response.data.userId,
+                nickname: response.data.username,
+            };
+            presentAddFriendConfirmation();
+        } else {
+            searchResult.value = null;
+            await showAlert('提示', '未查找到此用户');
+        }
+    } catch (error: any) {
+        console.error('搜索用户失败', error);
+        await showAlert('错误', error.response?.data?.message || '搜索用户失败，请重试。');
+    }
+};
+
+// 显示确认添加好友弹窗
+const presentAddFriendConfirmation = async () => {
+    const alert = await alertController.create({
+        header: '添加好友',
+        message: `用户名: ${searchResult.value?.nickname}`,
+        buttons: [
+            {
+                text: '取消',
+                role: 'cancel',
+            },
+            {
+                text: '添加',
+                handler: async () => {
+                    await addFriend();
+                },
+            },
+        ],
+    });
+    await alert.present();
+};
+
+// 添加好友函数
+const addFriend = async () => {
+    try {
+        const response = await appClient.post('/api/user/addFriend', {
+            userId: userStore.userId,
+            friendId: searchResult.value?.userId,
+        });
+
+        if (response.status === 200 && response.data.message === 'success') {
+            friends.value.push({
+                friendId: searchResult.value!.userId,
+                friendName: searchResult.value!.nickname,
+                friendEmail: '',
+            });
+            await showAlert('成功', '好友添加成功！');
+        } else {
+            await showAlert('失败', '好友添加失败，请重试。');
+        }
+    } catch (error: any) {
+        console.error('添加好友失败', error);
+        await showAlert('错误', error.response?.data?.message || '添加好友失败，请重试。');
+    }
 };
 
 // 使用 alertController 显示 alert
