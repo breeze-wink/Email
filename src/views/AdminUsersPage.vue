@@ -91,16 +91,21 @@
       return;
     }
   
+
     try {
-      // 模拟搜索功能，这里是一个简单的前端过滤，实际开发可能会调用后端搜索接口
-      users.value = users.value.filter(user =>
-        user.username.includes(searchQuery.value) || user.email.includes(searchQuery.value)
-      );
+      // 调用后端搜索接口实现模糊匹配
+      const response = await apiClient.get<User[]>('/api/administrator/search-users', {
+        params: { query: searchQuery.value }
+      });
+      if (response.status === 200) {
+        users.value = response.data;
+      }
     } catch (error) {
       console.error('搜索用户失败', error);
       await showAlert('错误', (error as any).response?.data?.message || '搜索用户失败，请重试。');
-
     }
+    
+    
   };
   
   // 初次加载页面时获取所有用户
@@ -173,9 +178,7 @@ const adjustUserPermissions = async (userId: string, username: string) => {
 // 删除用户函数
 const deleteUser = async (userId: string) => {
   try {
-    const response = await apiClient.delete('/api/user', {
-      params: { userId: userId }
-    });
+    const response = await apiClient.delete(`/api/user/${userId}`);
 
     if (response.status === 200) {
       users.value = users.value.filter(user => user.id !== userId);
