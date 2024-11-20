@@ -17,6 +17,7 @@
                     <ion-title size="large">好友列表</ion-title>
                 </ion-toolbar>
             </ion-header>
+            
 
             <ion-list>
                 <ion-item v-for="friend in friends" :key="friend.friendId">
@@ -24,7 +25,8 @@
                         <h2>{{ friend.friendName }}</h2>
                         <p>{{ friend.friendEmail }}</p>
                     </ion-label>
-                    <ion-icon :icon="sendOutline" slot="end"></ion-icon>
+                    <ion-icon :icon="sendOutline" slot="end"  @click="sendToSb(friend.friendEmail)"></ion-icon>
+                    <ion-icon :icon="closeOutline" slot="end"  @click="deleteFriend(friend.friendId)"></ion-icon>
                 </ion-item>
             </ion-list>
         </ion-content>
@@ -47,9 +49,10 @@ import {
     IonButton
 } from '@ionic/vue';
 import { ref, onMounted } from 'vue';
-import { addOutline, sendOutline } from 'ionicons/icons';
+import { addOutline, closeOutline, sendOutline } from 'ionicons/icons';
 import appClient from '@/services/api';
 import { useUserStore } from '@/store/user';
+import { useRouter } from 'vue-router';
 
 interface Friend {
     friendId: number;
@@ -60,19 +63,48 @@ interface Friend {
 const friends = ref<Friend[]>([]);
 const userStore = useUserStore();
 const searchResult = ref<{ userId: number; nickname: string; email: string } | null>(null);
+const router = useRouter();
+
 
 // 获取好友列表
 onMounted(async () => {
     try {
-        const response = await appClient.get('/api/friends', { params: { userId: userStore.userId } });
+        const response = await appClient.get('/api/user/friends', { params: { userId: userStore.userId } });
         if (response.status === 200) {
-            friends.value = response.data;
+            friends.value = response.data.friends;
+            console.log('好友列表:', response.data);  // 打印收到的好友列表信息
+            console.log ('shuzu',friends.value);
         }
     } catch (error: any) {
         console.error('获取好友列表失败', error);
         await showAlert('错误', error.response?.data?.message || '获取好友列表失败，请重试。');
     }
 });
+const deleteFriend = async(FriendId: number) => {
+    try{
+        const response = await appClient.delete('/api/user/friend', { params: { userId: userStore.userId,friendId:FriendId } });
+        if (response.status === 200) {
+            friends.value = friends.value.filter(friend => friend.friendId !== FriendId);
+            await showAlert('成功','成功删除该好友');
+        }
+
+    } catch(error: any) {
+        console.error('获取好友列表失败', error);
+        await showAlert('错误', error.response?.data?.message || '获取好友列表失败，请重试。');
+    }
+
+}
+
+
+// 发送邮件函数
+const sendToSb = (email: string) => {
+  router.push({
+    path: '/MailTabs/sendMailTab',
+    query: { email: email },
+  });
+};
+
+
 
 // 显示添加好友弹窗
 const presentAddFriendAlert = async () => {
@@ -115,8 +147,8 @@ const searchFriend = async (email: string) => {
 
         if (response.status === 200 && response.data.userId) {
             // 检查该用户是否已经是好友
-            const isAlreadyFriend = friends.value.some(friend => friend.friendId === response.data.userId);
-            if (isAlreadyFriend) {
+           
+            if (friends.value && Array.isArray(friends.value) && friends.value.some(friend => friend.friendId === response.data.userId)) {
                 await showAlert('提示', '该用户已经是您的好友');
                 return;
             }

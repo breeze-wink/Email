@@ -244,6 +244,7 @@ const saveDraft = async () => {
 // 页面挂载时检查是否有草稿信息需要填充
 onIonViewWillEnter(async () => {
   mailId.value = route.query.mailId as string || null;
+  const friendEmail = route.query.email as string || null;
   if (mailId.value) {
     try {
       const response = await apiClient.get(`/api/mail/${mailId.value}`);
@@ -258,6 +259,9 @@ onIonViewWillEnter(async () => {
     } catch (error) {
       console.error('Failed to fetch draft details:', error);
     }
+  }
+  if (friendEmail) {
+    toAddress.value = friendEmail;
   }
   
 });
