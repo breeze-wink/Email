@@ -17,8 +17,11 @@
 
             <!-- 搜索栏 -->
       
+            <div class="search-container">
                 <ion-searchbar v-model="searchEmail" placeholder="输入好友邮箱地址"></ion-searchbar>
                 <ion-button expand="full" @click="searchFriend" class="search-button">搜索</ion-button>
+            </div>
+
 
 
             <!-- 搜索结果 -->
@@ -93,7 +96,8 @@ const searchFriend = async () => {
 // 添加好友函数
 const addFriend = async () => {
     try {
-        const response = await appClient.post('/api/friends/add', {
+        const response = await appClient.post('/api/user/friends/add', {
+            
             email: searchResult.value?.email
         });
 
@@ -122,11 +126,25 @@ const showAlert = async (header: string, message: string) => {
 <style scoped>
 
 
-.search-button {
-    margin: 10px 0;
+.search-container {
+  display: flex;
+  align-items: center;
 }
+
+.search-container ion-searchbar {
+  flex: 1; /* 让搜索框占据剩余的空间 */
+  margin-right: 10px; /* 搜索框与按钮之间的间距 */
+}
+
+.search-container ion-button {
+  flex-shrink: 0; /* 按钮宽度保持不变 */
+}
+
 
 ion-card {
     margin-top: 20px;
 }
+
+
+
 </style>
