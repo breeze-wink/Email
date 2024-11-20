@@ -46,13 +46,10 @@
         <p>加载中...</p>
       </div>
     </ion-content>
-    <ion-footer>
-      <ion-toolbar>
-        <ion-button expand="block" color="danger" @click="deleteMail">
-          删除邮件
-        </ion-button>
-      </ion-toolbar>
-    </ion-footer>
+    <ion-button expand="block" color="danger" @click="deleteMail" class="click-button">
+      <ion-icon :icon="trashOutline"></ion-icon>
+      删除邮件
+    </ion-button>
   </ion-page>
 </template>
 
@@ -62,7 +59,7 @@ import { ref, onMounted } from 'vue';
 import apiClient from '@/services/api';
 import { useRouter } from 'vue-router';
 import { useUserStore } from '@/store/user';
-import { arrowBackCircleOutline, documentOutline, downloadOutline } from 'ionicons/icons';
+import { arrowBackCircleOutline, documentOutline, downloadOutline, trashOutline } from 'ionicons/icons';
 
 interface Mail {
   id: number;
@@ -157,4 +154,11 @@ ion-item {
 ion-button {
   --border-radius: 12px;
 }
+
+.click-button {
+  margin-top: 20px;
+  margin-bottom: 40px;
+}
+
 </style>
+

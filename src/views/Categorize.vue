@@ -17,7 +17,7 @@
         <ion-row class="center-content">
           <!-- 草稿箱 -->
           <ion-col size="6">
-            <ion-card color="light" @click="navigateTo('draft')">
+            <ion-card color="light" @click="navigateTo('drafts')">
               <ion-card-header>
                 <ion-card-title>
                   <ion-icon :icon="documentOutline"></ion-icon>

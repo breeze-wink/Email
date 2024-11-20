@@ -48,7 +48,6 @@
   const pageNum = ref(1);
   const pageSize = 10;
   const userStore = useUserStore();
-  const shouldReloadMails = ref(true);
 
   
   const fetchOutboxMails = async (reset = false) => {
@@ -80,18 +79,14 @@
   const openMail = (mail : Mail) => {
     userStore.setMailId(mail.id);
     router.push(`/MailTabs/outboxDetail`);
-    shouldReloadMails.value = true;
   };
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleString();
   };
   onIonViewWillEnter(() => {
-    if (shouldReloadMails.value) {
-      shouldReloadMails.value = false;  // 防止重复加载
       fetchOutboxMails(true);  // 每次进入页面时，重新获取最新数据
-    }
-});
+  });
   </script>
   
   

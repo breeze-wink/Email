@@ -55,7 +55,6 @@ const mails = ref<Mail[]>([]);
 const pageNum = ref(1);
 const pageSize = 10;
 const userStore = useUserStore();
-const shouldReloadMails = ref(true);
 
 const fetchMails = async (reset = false) => {
   try {
@@ -88,15 +87,11 @@ const openMail = (mail: Mail) => {
   userStore.setMailId(mail.id);
   router.push(`/MailTabs/mailDetail`);
   // 标记需要重新加载
-  shouldReloadMails.value = true;
 };
 
 // 页面进入时，重新加载邮件
 onIonViewWillEnter(() => {
-  if (shouldReloadMails.value) {
-    shouldReloadMails.value = false;  // 防止重复加载
     fetchMails(true);  // 每次进入页面时，重新获取最新数据
-  }
 });
 
 const formatDate = (dateString: string) => {
