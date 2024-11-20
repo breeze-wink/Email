@@ -59,12 +59,12 @@ interface Friend {
 
 const friends = ref<Friend[]>([]);
 const userStore = useUserStore();
-const searchResult = ref<{ userId: number; nickname: string } | null>(null);
+const searchResult = ref<{ userId: number; nickname: string; email: string } | null>(null);
 
 // 获取好友列表
 onMounted(async () => {
     try {
-        const response = await appClient.get('/api/user/friends', { params: { userId: userStore.userId } });
+        const response = await appClient.get('/api/friends', { params: { userId: userStore.userId } });
         if (response.status === 200) {
             friends.value = response.data;
         }
@@ -114,9 +114,17 @@ const searchFriend = async (email: string) => {
         });
 
         if (response.status === 200 && response.data.userId) {
+            // 检查该用户是否已经是好友
+            const isAlreadyFriend = friends.value.some(friend => friend.friendId === response.data.userId);
+            if (isAlreadyFriend) {
+                await showAlert('提示', '该用户已经是您的好友');
+                return;
+            }
+            
             searchResult.value = {
                 userId: response.data.userId,
                 nickname: response.data.username,
+                email: email,
             };
             presentAddFriendConfirmation();
         } else {
@@ -158,11 +166,11 @@ const addFriend = async () => {
             friendId: searchResult.value?.userId,
         });
 
-        if (response.status === 200 && response.data.message === 'success') {
+        if (response.status === 200 ) {
             friends.value.push({
                 friendId: searchResult.value!.userId,
                 friendName: searchResult.value!.nickname,
-                friendEmail: '',
+                friendEmail: searchResult.value!.email,
             });
             await showAlert('成功', '好友添加成功！');
         } else {
