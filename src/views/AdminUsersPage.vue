@@ -106,10 +106,13 @@
   onMounted(() => {
     fetchAllUsers();
   });
+
   const viewUserDetail = (userId: string) => {
+    console.log(userId);
   router.push({
     path: '/AdminTabs/userDetail',
-    query: { userId: userId }
+    query: { detailId: userId }
+
   });
 };
 

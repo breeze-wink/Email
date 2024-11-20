@@ -80,8 +80,9 @@ const detailId = ref<string | null>(null);
 
 onMounted(async () => {
     detailId.value = route.query.detailId as string || null;
+    console.log(detailId.value)
     try {
-        const response = await appClient.get(`/api/user/${detailId.value}`);
+        const response = await appClient.get(`/api/administrator/${detailId.value}`);
         if (response.status === 200) {
             user.value = response.data;
         }
@@ -90,8 +91,6 @@ onMounted(async () => {
         alert(error.response?.data?.message || '获取用户信息失败请重试。');
     }
 });
-
-
 
 
 </script>
