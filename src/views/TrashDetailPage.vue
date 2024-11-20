@@ -46,11 +46,18 @@
           <p>加载中...</p>
         </div>
       </ion-content>
+      <ion-footer>
+        <ion-toolbar>
+          <ion-button expand="block" color="danger" @click="deleteMail">
+            删除邮件
+          </ion-button>
+        </ion-toolbar>
+      </ion-footer>
     </ion-page>
   </template>
   
   <script setup lang="ts">
-  import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent, IonList, IonListHeader, IonItem, IonLabel, IonIcon, IonButton, IonSpinner, IonBackButton, IonButtons } from '@ionic/vue';
+  import { IonFooter, IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent, IonList, IonListHeader, IonItem, IonLabel, IonIcon, IonButton, IonSpinner, IonBackButton, IonButtons } from '@ionic/vue';
   import { ref, onMounted } from 'vue';
   import apiClient from '@/services/api';
   import { useRouter } from 'vue-router';
@@ -80,13 +87,23 @@ import { arrowBackCircleOutline, documentOutline, downloadOutline } from 'ionico
   const fetchtTrashDetails = async () => {
     try {
       const mailId = userStore.mailId;
-      const response = await apiClient.get<Mail>(`/api/trash/${mailId}`);
+      const response = await apiClient.get<Mail>(`/api/mail/${mailId}`);
       mail.value = response.data;
     } catch (error) {
       console.error('Failed to fetch trash mail details:', error);
     }
   };
   
+  const deleteMail = async () => {
+  try {
+    const mailId = userStore.mailId;
+    await apiClient.delete(`/api/mail/${mailId}`);
+    router.push('/MailTabs/trash');
+  } catch (error) {
+    console.error('Failed to delete mail:', error);
+  }
+  };
+
   const downloadAttachment = (attachment: { fileName: string; fileType: string; fileData: string }) => {
     const byteCharacters = atob(attachment.fileData);
     const byteNumbers = new Array(byteCharacters.length);

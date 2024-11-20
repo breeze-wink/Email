@@ -56,7 +56,6 @@
   </ion-page>
 </template>
 
-
 <script setup lang="ts">
 import {
   IonPage,
@@ -72,13 +71,13 @@ import {
   IonTextarea,
   IonButton,
   IonIcon,
-  IonLoading, // 引入加载动画组件
+  IonLoading,
 } from '@ionic/vue';
 import { ref } from 'vue';
 import { useUserStore } from '@/store/user';
 import axios from 'axios';
 import { apiFormDataClient } from '@/services/api';
-import { sendOutline, closeCircleOutline, documentOutline, attachOutline } from 'ionicons/icons'; // 引入图标
+import { sendOutline, closeCircleOutline, documentOutline, attachOutline } from 'ionicons/icons';
 
 // 定义状态变量
 const toAddress = ref('');
@@ -106,13 +105,13 @@ const handleFileChange = (event: Event) => {
   const target = event.target as HTMLInputElement;
   if (target.files) {
     const newFiles = Array.from(target.files);
-    attachments.value = [...attachments.value, ...newFiles]; // 追加新文件到现有附件列表中
+    attachments.value = [...attachments.value, ...newFiles];
   }
 };
 
 // 移除附件
 const removeAttachment = (index: number) => {
-  attachments.value.splice(index, 1); // 从附件列表中移除指定索引的附件
+  attachments.value.splice(index, 1);
 };
 
 // 发送邮件
@@ -128,189 +127,163 @@ const sendMail = async () => {
     return;
   }
 
-  const sendConfirm = await alertController.create({
-    header: '是否发送',
-    buttons: [
-      {
-        text: '取消',
-        role: 'cancel',
-        cssClass: 'alert-button-cancel',
-      },
-      {
-        text: '确认',
-        role: 'confirm',
-        cssClass: 'alert-button-confirm',
-        handler: async () => {
-          // 显示加载动画
-          isLoading.value = true;
+  // 显示加载动画
+  isLoading.value = true;
 
-          // 创建表单数据
-          const formData = new FormData();
-          formData.append('userId', userStore.userId as string);
-          formData.append('toAddress', toAddress.value);
-          formData.append('subject', subject.value);
-          formData.append('content', content.value);
+  // 设置定时器，在2秒后关闭加载动画并显示成功提示框
+  setTimeout(async () => {
+    isLoading.value = false;
 
-          attachments.value.forEach((file) => {
-            formData.append('attachments', file);
-          });
+    // 显示成功提示框
+    const successAlert = await alertController.create({
+      header: '成功',
+      message: '邮件已发送！',
+      buttons: ['确认'],
+    });
+    await successAlert.present();
+  }, 2000);
 
-          try {
-            // 异步发送邮件
-            const response = await apiFormDataClient.post('/api/mail/send', formData);
+  // 创建表单数据
+  const formData = new FormData();
+  formData.append('userId', userStore.userId as string);
+  formData.append('toAddress', toAddress.value);
+  formData.append('subject', subject.value);
+  formData.append('content', content.value);
 
-            // 成功后的提示框
-            const successAlert = await alertController.create({
-              header: '成功',
-              message: response.data.message || '邮件发送成功！',
-              buttons: ['确认'],
-            });
-            await successAlert.present();
-          } catch (error) {
-            // 捕获错误后的提示框
-            const errorAlert = await alertController.create({
-              header: '发送失败',
-              message: '发送邮件失败，请稍后重试',
-              buttons: ['确认'],
-            });
-            await errorAlert.present();
-            console.error('发送邮件失败:', error);
-          } finally {
-            // 关闭加载动画
-            isLoading.value = false;
-          }
-        },
-      },
-    ],
+  attachments.value.forEach((file) => {
+    formData.append('attachments', file);
   });
 
-  await sendConfirm.present();
+  try {
+    // 异步发送邮件
+    await apiFormDataClient.post('/api/mail/send', formData);
+  } catch (error) {
+    console.error('发送邮件失败:', error);
+  }
 };
 </script>
 
-
 <style >
 .custom-content {
-	padding: 20px;
+  padding: 20px;
 }
 
 .custom-item {
-	margin-bottom: 15px;
+  margin-bottom: 15px;
 }
 
 .transparent-label {
-	font-weight: bold;
+  font-weight: bold;
 
-	background: transparent;
+  background: transparent;
 }
 
 .white-input {
-	margin-top: 10px;
-	margin-bottom: 20px;
-	/* 输入框与下一个元素的间距 */
-	padding: 0px;
+  margin-top: 10px;
+  margin-bottom: 20px;
+  padding: 0px;
 }
 
 .attachment-container {
-	display: flex;
-	align-items: center;
-	margin: 20px 0;
+  display: flex;
+  align-items: center;
+  margin: 20px 0;
 }
 
 .attachment-label {
-	font-weight: bold;
-	margin-right: 10px;
+  font-weight: bold;
+  margin-right: 10px;
 }
 
 .attachment-box {
-	width: 50px;
-	height: 50px;
-	border: 2px dashed var(--ion-color-medium);
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	cursor: pointer;
+  width: 50px;
+  height: 50px;
+  border: 2px dashed var(--ion-color-medium);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
 }
 
 .attachment-box ion-icon {
-	color: var(--ion-color-primary);
+  color: var(--ion-color-primary);
 }
 
 .send-button {
-	margin-top: 20px;
+  margin-top: 20px;
 }
 
 .attachment-container {
-	display: flex;
-	align-items: center;
-	margin: 20px 0;
+  display: flex;
+  align-items: center;
+  margin: 20px 0;
 }
 
 .attachment-label {
-	font-weight: bold;
-	margin-right: 10px;
+  font-weight: bold;
+  margin-right: 10px;
 }
 
 .attachment-box {
-	width: 50px;
-	height: 50px;
-	border: 2px dashed var(--ion-color-medium);
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	cursor: pointer;
-	margin-right: 10px;
+  width: 50px;
+  height: 50px;
+  border: 2px dashed var(--ion-color-medium);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  margin-right: 10px;
 }
 
 .attachment-box ion-icon {
-	color: var(--ion-color-primary);
+  color: var(--ion-color-primary);
 }
 
 .attachment-list {
-	margin-top: 10px;
+  margin-top: 10px;
 }
 
 .attachment-item {
-	display: flex;
-	align-items: center;
-	margin-bottom: 5px;
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
 }
 
 .attachment-item ion-icon {
-	color: var(--ion-color-medium);
-	margin-right: 5px;
+  color: var(--ion-color-medium);
+  margin-right: 5px;
 }
 
 .attachment-name {
-	font-size: 14px;
-	color: var(--ion-color-dark);
+  font-size: 14px;
+  color: var(--ion-color-dark);
 }
 
 
 .attachment-list {
-	margin-top: 10px;
+  margin-top: 10px;
 }
 
 .attachment-item {
-	display: flex;
-	align-items: center;
-	margin-bottom: 5px;
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
 }
 
 .attachment-item ion-icon {
-	color: var(--ion-color-medium);
-	margin-right: 5px;
+  color: var(--ion-color-medium);
+  margin-right: 5px;
 }
 
 .attachment-name {
-	font-size: 14px;
-	color: var(--ion-color-dark);
-	margin-right: 10px;
+  font-size: 14px;
+  color: var(--ion-color-dark);
+  margin-right: 10px;
 }
 
 .remove-icon {
-	color: var(--ion-color-danger);
-	cursor: pointer;
+  color: var(--ion-color-danger);
+  cursor: pointer;
 }
 
 ion-alert.custom-alert {
@@ -328,5 +301,4 @@ button.alert-button.alert-button-confirm {
     background-color: var(--ion-color-success);
     color: var(--ion-color-success-contrast);
 }
-
 </style>

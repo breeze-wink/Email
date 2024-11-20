@@ -80,7 +80,7 @@ import { arrowBackCircleOutline, documentOutline, downloadOutline } from 'ionico
   const fetchtOutboxDetails = async () => {
     try {
       const mailId = userStore.mailId;
-      const response = await apiClient.get<Mail>(`/api/outbox/${mailId}`);
+      const response = await apiClient.get<Mail>(`/api/mail/${mailId}`);
       mail.value = response.data;
     } catch (error) {
       console.error('Failed to fetch outbox mail details:', error);

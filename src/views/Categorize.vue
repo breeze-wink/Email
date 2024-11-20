@@ -5,7 +5,7 @@
         <ion-title>邮件分类</ion-title>
       </ion-toolbar>
     </ion-header>
-    <ion-content :fullscreen="true" class="center-content">
+    <ion-content :fullscreen="true">
       <ion-header collapse="condense">
         <ion-toolbar>
           <ion-title size="large">邮件分类</ion-title>
@@ -13,11 +13,11 @@
       </ion-header>
 
       <!-- 2x2 网格布局 -->
-      <ion-grid fixed>
-        <ion-row>
+      <ion-grid :fixed="true">
+        <ion-row class="center-content">
           <!-- 草稿箱 -->
           <ion-col size="6">
-            <ion-card @click="navigateTo('draft')">
+            <ion-card color="light" @click="navigateTo('draft')">
               <ion-card-header>
                 <ion-card-title>
                   <ion-icon :icon="documentOutline"></ion-icon>
@@ -40,10 +40,10 @@
           </ion-col>
         </ion-row>
 
-        <ion-row>
+        <ion-row class="center-content">
           <!-- 垃圾箱 -->
           <ion-col size="6">
-            <ion-card @click="navigateTo('trash')">
+            <ion-card color="dark" @click="navigateTo('trash')">
               <ion-card-header>
                 <ion-card-title>
                   <ion-icon :icon="trashOutline"></ion-icon>
@@ -55,7 +55,7 @@
 
           <!-- 发件箱 --> 
           <ion-col size="6">
-            <ion-card @click="navigateTo('sent')">
+            <ion-card color="medium" @click="navigateTo('outbox')">
               <ion-card-header>
                 <ion-card-title>
                   <ion-icon :icon="sendOutline"></ion-icon>
@@ -105,12 +105,12 @@ const navigateTo = (folder: string) => {
 /* 使用 flex 布局使内容垂直居中 */
 .center-content {
   display: flex;
-  flex-direction: column;
-  justify-content: center; /* 垂直居中 */
-  align-items: center;     /* 水平居中 */
-  margin-top: 50px;
-
-  padding: 0 16px;         /* 添加左右边距，避免内容紧贴屏幕边缘 */
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;    /* 水平居中 */
+  margin-top: 50px; 
+  --ion-grid-column-padding: 0px;
+  padding: 0 20px;         /* 添加左右边距，避免内容紧贴屏幕边缘 */
   box-sizing: border-box;  /* 确保 padding 不影响整体布局 */
 }
 
@@ -118,11 +118,17 @@ ion-card {
   text-align: center;
   --background: #f4f4f4;
   width: 90%; /* 控制卡片宽度，使其在小屏幕上更好显示 */
-  margin: 10px auto; /* 给卡片添加一些上下的间距 */
+  height: 100px; /* 设定卡片的固定高度 */
+  margin: 20px auto; /* 给卡片添加一些上下的间距 */
+  display: flex; /* 使用 Flexbox 布局 */
+  flex-direction: column; /* 使内容纵向排列 */
+  justify-content: center; /* 垂直居中内容 */
+  align-items: center; /* 水平居中内容 */
 }
 
+
 ion-card-title {
-  font-size: 1.2em;
+  font-size: 1.4em;
   display: flex;
   align-items: center;
   gap: 10px;

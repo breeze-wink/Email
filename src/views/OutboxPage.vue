@@ -9,9 +9,6 @@
         </ion-toolbar>
       </ion-header>
       <ion-content :fullscreen="true">
-        <ion-header collapse="condense">
-          
-        </ion-header>
         <ion-list>
           <ion-item v-for="mail in mails" :key="mail.id" @click="openMail(mail)">
             <ion-label>
@@ -19,7 +16,7 @@
               <p>{{ mail.fromAddress }}</p>
               <p>{{ formatDate(mail.sentTime) }}</p>
             </ion-label>
-            <ion-icon :icon="sendOutline"></ion-icon>
+            <ion-icon :icon="mailOutline" slot="start"></ion-icon>
           </ion-item>
         </ion-list>
         <ion-infinite-scroll @ionInfinite="loadMore">
@@ -32,7 +29,8 @@
   <script setup lang="ts">
   import { IonButtons, IonBackButton, IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonList, IonItem, IonLabel, IonIcon, IonInfiniteScroll, IonInfiniteScrollContent } from '@ionic/vue';
   import { ref, onMounted } from 'vue';
-  import { arrowBackCircleOutline, sendOutline } from 'ionicons/icons';
+  import { onIonViewWillEnter } from '@ionic/vue';
+  import { arrowBackCircleOutline, mailOutline } from 'ionicons/icons';
   import router from '@/router';
   import apiClient from '@/services/api';
   import { useUserStore } from '@/store/user';
@@ -50,9 +48,16 @@
   const pageNum = ref(1);
   const pageSize = 10;
   const userStore = useUserStore();
+  const shouldReloadMails = ref(true);
+
   
-  const fetchOutboxMails = async () => {
+  const fetchOutboxMails = async (reset = false) => {
     try {
+      // 清空之前的数据，确保重新获取
+      if (reset) {
+        mails.value = [];
+        pageNum.value = 1;
+      }
       const response = await apiClient.get<Mail[]>('/api/mail/outbox', {
         params: {
           userId: userStore.userId,
@@ -75,15 +80,18 @@
   const openMail = (mail : Mail) => {
     userStore.setMailId(mail.id);
     router.push(`/MailTabs/outboxDetail`);
-    
+    shouldReloadMails.value = true;
   };
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleString();
   };
-  onMounted(() => {
-    fetchOutboxMails();
-  });
+  onIonViewWillEnter(() => {
+    if (shouldReloadMails.value) {
+      shouldReloadMails.value = false;  // 防止重复加载
+      fetchOutboxMails(true);  // 每次进入页面时，重新获取最新数据
+    }
+});
   </script>
   
   
