@@ -1,6 +1,6 @@
 <template>
     <ion-page>
-        <ion-header>
+        <ion-header style="margin-bottom: 0;">
             <ion-toolbar color="dark">
                 <ion-title>个人信息</ion-title>
             </ion-toolbar>

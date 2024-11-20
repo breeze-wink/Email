@@ -73,18 +73,28 @@ const routes: Array<RouteRecordRaw> = [
 
 
 
-
-
-
-
-
       {
         path: 'sendMailTab',
         component: () => import('@/views/SendMailPage.vue')
       },
       {
+        path: 'friendsTab',
+        component: () => import('@/views/FriendsPage.vue')
+      },
+      
+      {
         path: 'PersonalInfoTab',
         component: () => import('@/views/PersonalInfoPage.vue')
+      },
+      {
+        path: 'friendsTab',
+        component: () => import('@/views/FriendsPage.vue')
+      },
+      
+      {
+        path: 'addFriend',
+        component: () => import('@/views/AddFriendPage.vue')
+
       }
     ]
   }
