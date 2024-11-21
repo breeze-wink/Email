@@ -19,7 +19,8 @@
           <ion-col size="6">
             <ion-card color="light" 
              :class="{ 'disabled-card': userStore.send_permission === 0 }"
-            @click="userStore.send_permission !== 0 ? navigateTo('drafts') : null">
+            @click="userStore.send_permission !== 0 ? navigateTo('drafts') : null"
+            style="cursor:pointer;">
               <ion-card-header>
                 <ion-card-title>
                   <ion-icon :icon="documentOutline"></ion-icon>
@@ -33,7 +34,8 @@
           <ion-col size="6">
             <ion-card color="tertiary"
             :class="{ 'disabled-card': userStore.receive_permission === 0 }"
-            @click="userStore.receive_permission !== 0 ? navigateTo('mailTab') : null">
+            @click="userStore.receive_permission !== 0 ? navigateTo('mailTab') : null"
+            style="cursor:pointer;">
               <ion-card-header>
                 <ion-card-title>
                   <ion-icon :icon="mailUnreadOutline"></ion-icon>
@@ -47,7 +49,7 @@
         <ion-row class="center-content">
           <!-- 垃圾箱 -->
           <ion-col size="6">
-            <ion-card color="dark" @click="navigateTo('trash')">
+            <ion-card color="dark" @click="navigateTo('trash')" style="cursor:pointer;">
               <ion-card-header>
                 <ion-card-title>
                   <ion-icon :icon="trashOutline"></ion-icon>
@@ -59,7 +61,7 @@
 
           <!-- 发件箱 --> 
           <ion-col size="6">
-            <ion-card color="medium" @click="navigateTo('outbox')">
+            <ion-card color="medium" @click="navigateTo('outbox')" style="cursor:pointer;">
               <ion-card-header>
                 <ion-card-title>
                   <ion-icon :icon="sendOutline"></ion-icon>
