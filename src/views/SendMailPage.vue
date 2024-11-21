@@ -20,8 +20,24 @@
 
       <!-- 正文 -->
       <ion-textarea label="正文" label-placement="floating" :auto-grow="true"
-       v-model="content" fill="solid" placeholder="请输入邮件内容">
+       v-model="content" fill="solid" placeholder="请输入邮件内容" class="white-input">
       </ion-textarea>
+
+      <!-- 定时发送选项 -->
+      <ion-item lines="none" class="spacing-item">
+          <ion-checkbox slot="start" v-model="scheduledSend"></ion-checkbox>
+          <ion-label>定时发送</ion-label>
+          <div v-if="scheduledSend" class="datetime-container">
+            <ion-icon :icon="alarmOutline" size="large"></ion-icon>
+            <ion-datetime-button datetime="datetime"></ion-datetime-button>
+
+            <ion-modal :keep-contents-mounted="true">
+              <ion-datetime id="datetime"></ion-datetime>
+            </ion-modal>
+          </div>
+
+          
+      </ion-item>
 
       <!-- 附件选择框 -->
       <div class="attachment-container">
@@ -73,6 +89,10 @@ import {
   IonTitle,
   IonContent,
   IonItem,
+  IonCheckbox,
+  IonDatetimeButton,
+  IonDatetime,
+  IonModal,
   IonAlert,
   alertController,
   IonLabel,
@@ -88,7 +108,7 @@ import { useUserStore } from '@/store/user';
 import {onIonViewWillEnter} from '@ionic/vue';
 import apiClient from '@/services/api';
 import { apiFormDataClient } from '@/services/api';
-import {arrowBackCircleOutline, trashOutline,sendOutline, closeCircleOutline, documentOutline, attachOutline, saveOutline } from 'ionicons/icons';
+import {alarmOutline, arrowBackCircleOutline, trashOutline,sendOutline, closeCircleOutline, documentOutline, attachOutline, saveOutline } from 'ionicons/icons';
 import { useRouter, useRoute } from 'vue-router';
 
 // 定义状态变量
@@ -99,6 +119,7 @@ const attachments = ref<File[]>([]);
 const fileInput = ref<HTMLInputElement | null>(null);
 const isDraft = ref(false);
 const mailId = ref<string | null>(null);
+const scheduledSend = ref(false);
 
 // 定义加载动画状态变量
 const isLoading = ref(false);
@@ -365,7 +386,11 @@ onIonViewWillEnter(async () => {
   color: var(--ion-color-dark);
 }
 
-
+.datetime-container {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* 设置图标和按钮之间的间距 */
+}
 .attachment-list {
   margin-top: 10px;
 }
