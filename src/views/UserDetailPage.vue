@@ -2,13 +2,16 @@
     <ion-page>
         <ion-header style="margin-bottom: 0;">
             <ion-toolbar color="dark">
+                <ion-buttons slot="start">
+                    <ion-back-button :icon="arrowBackCircleOutline" default-href="/MailTabs/categorizeTab" text="返回"></ion-back-button>
+                </ion-buttons>
                 <ion-title>用户详情</ion-title>
             </ion-toolbar>
         </ion-header>
         <ion-content :fullscreen="true">
             <ion-header collapse="condense">
                 <ion-toolbar>
-                    <ion-title size="large">个人信息</ion-title>
+                    <ion-title size="large">yonghuxiangqing</ion-title>
                 </ion-toolbar>
             </ion-header>
             <div class="info-container" v-if="user">
@@ -54,19 +57,21 @@ import {
     IonItem,
     IonLabel,
     IonText,
-    alertController
+    alertController,
+    IonButtons, IonBackButton
 } from '@ionic/vue';
 import { useUserStore } from '@/store/user';
 import { ref, onMounted } from 'vue';
 import appClient from '@/services/api';
 import { useRouter, useRoute } from 'vue-router';
-import { keyOutline, logOutOutline, pencilOutline } from 'ionicons/icons'; // 引入图标
+import { arrowBackCircleOutline } from 'ionicons/icons';
 
 const userStore = useUserStore();
 const router = useRouter();
 const route = useRoute();
 
 interface User {
+    id: string;
     username: string;
     email: string;
     pop3Server: string;
@@ -79,7 +84,8 @@ const user = ref<User | null>(null);
 const detailId = ref<string | null>(null);
 
 onMounted(async () => {
-    detailId.value = route.query.detailId as string || null;
+    detailId.value = route.params.detailId as string || null;
+    console.log(detailId.value)
     try {
         const response = await appClient.get(`/api/user/${detailId.value}`);
         if (response.status === 200) {
@@ -90,8 +96,6 @@ onMounted(async () => {
         alert(error.response?.data?.message || '获取用户信息失败请重试。');
     }
 });
-
-
 
 
 </script>

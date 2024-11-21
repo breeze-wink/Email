@@ -119,9 +119,9 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('@/views/AdminSettingPage.vue')
       },
       {
-        path: 'userDetail',
+        path: 'userDetail/:detailId',
+       
         component: () => import('@/views/UserDetailPage.vue')
-
       }
     
     

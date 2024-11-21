@@ -15,9 +15,6 @@
                 <ion-item>
                     <ion-label>用户名: </ion-label>
                     <ion-text>{{ user.username }}</ion-text>
-                    <ion-button fill="clear" @click="presentEditUsernameAlert">
-                        <ion-icon :icon="pencilOutline"></ion-icon>
-                    </ion-button>
                 </ion-item>
                 <ion-item>
                     <ion-label>邮箱: </ion-label>
@@ -107,76 +104,6 @@ const logout = () => {
     router.push('/loginTabs/login'); // 跳转到登录页面
 };
 
-// 显示修改用户名的 alert
-const presentEditUsernameAlert = async () => {
-    const alert = await alertController.create({
-        header: '修改用户名',
-        inputs: [
-            {
-                name: 'newUsername',
-                type: 'text',
-                placeholder: '请输入新的用户名',
-                value: user.value?.username, // 预填入当前的用户名
-            },
-        ],
-        buttons: [
-            {
-                text: '取消',
-                role: 'cancel',
-            },
-            {
-                text: '确认',
-                handler: async (data: any) => {
-                    const newUsername = data.newUsername;
-                    if (!newUsername) {
-                        const emptyUsernameAlert = await alertController.create({
-                            header: '警告',
-                            message: '用户名不能为空，请输入新的用户名。',
-                            buttons: ['确定']
-                        });
-                        await emptyUsernameAlert.present();
-                        return false;
-                    }
-
-                    // 更新用户名的 API 调用
-                    try {
-                        const response = await appClient.post('/api/user/update-username', {
-                            userId: userStore.userId,
-                            username: newUsername,
-                        });
-
-                        if (response.status === 200) {
-                            const successAlert = await alertController.create({
-                                header: '成功',
-                                message: '用户名修改成功！',
-                                buttons: ['确定']
-                            });
-                            await successAlert.present();
-                            user.value!.username = newUsername;
-                        } else {
-                            const failureAlert = await alertController.create({
-                                header: '失败',
-                                message: '用户名修改失败，请重试。',
-                                buttons: ['确定']
-                            });
-                            await failureAlert.present();
-                        }
-                    } catch (error: any) {
-                        console.error('修改用户名失败', error);
-                        const errorAlert = await alertController.create({
-                            header: '错误',
-                            message: error.response?.data?.message || '修改用户名失败，请重试。',
-                            buttons: ['确定']
-                        });
-                        await errorAlert.present();
-                    }
-                },
-            },
-        ],
-    });
-
-    await alert.present();
-};
 
 // 显示修改密码的 alert
 const presentChangePasswordAlert = async () => {

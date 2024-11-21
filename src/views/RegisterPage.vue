@@ -28,13 +28,21 @@
         </ion-item>
         <ion-button class="custom-button" @click="register">注册</ion-button>
       </div>
+
+      <!-- 加载动画 -->
+      <ion-loading
+        :is-open="isLoading"
+        :message="loadingMessage"
+        spinner="crescent"
+      ></ion-loading>
     </ion-content>
   </ion-page>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonItem, IonLabel, IonInput, IonButton } from '@ionic/vue';
+import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonItem, IonLabel, IonInput, IonButton, IonLoading } from '@ionic/vue';
+import { alertController } from '@ionic/vue';
 import appClient from '@/services/api';
 import router from '@/router';
 
@@ -50,6 +58,10 @@ const authorizationCode = ref('');
 const email = ref('');
 const emailError = ref('');
 
+// 加载动画状态
+const isLoading = ref(false);
+const loadingMessage = ref('正在注册，请稍候...');
+
 const validateEmail = () => {
   if (email.value && !/^\S+@\S+\.\S+$/.test(email.value)) {
     emailError.value = 'Invalid email format';
@@ -57,20 +69,42 @@ const validateEmail = () => {
     emailError.value = '';
   }
 };
+
 const register = async () => {
   try {
+    // 显示加载动画
+    isLoading.value = true;
+
     const response = await appClient.post('/api/user/register', {
       username: username.value,
       password: password.value,
       email: email.value,
       authorizationCode: authorizationCode.value,
     });
+    
+    // 关闭加载动画
+    isLoading.value = false;
+
     if (response.status === 201) {
-      alert('注册成功');
-      router.push('/loginTabs/login')
+      const successAlert = await alertController.create({
+        header: '注册成功',
+        buttons: ['确认'],
+      });
+      await successAlert.present();
+      router.push('/loginTabs/login');
     }
   } catch (error: any) {
-    alert(`注册失败: ${error.response && error.response.data && error.response.data.message ? error.response.data.message : error.message}`);
+    // 关闭加载动画
+    isLoading.value = false;
+
+    const errorMessage = error.response && error.response.data && error.response.data.message ? error.response.data.message : error.message;
+    
+    const errorAlert = await alertController.create({
+      header: '注册失败',
+      message: errorMessage,
+      buttons: ['确认'],
+    });
+    await errorAlert.present();
   }
 };
 </script>

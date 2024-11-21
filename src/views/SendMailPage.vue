@@ -20,8 +20,28 @@
 
       <!-- 正文 -->
       <ion-textarea label="正文" label-placement="floating" :auto-grow="true"
-       v-model="content" fill="solid" placeholder="请输入邮件内容">
+       v-model="content" fill="solid" placeholder="请输入邮件内容" class="white-input">
       </ion-textarea>
+
+      <!-- 定时发送选项 -->
+      <ion-item lines="none" class="spacing-item">
+          <ion-checkbox slot="start" v-model="scheduledSend"></ion-checkbox>
+          <ion-label>定时发送</ion-label>
+          <div v-if="scheduledSend" class="datetime-container">
+            <ion-icon :icon="alarmOutline" size="large"></ion-icon>
+            <ion-datetime-button datetime="datetime"></ion-datetime-button>
+
+            <ion-modal :keep-contents-mounted="true">
+            <!-- 日期时间选择器 -->
+            <ion-datetime 
+              id="datetime" 
+              v-model="selectedDate" 
+              presentation="date-time" 
+              @ionChange="updateSendTime">
+            </ion-datetime>
+          </ion-modal>
+          </div>
+        </ion-item>
 
       <!-- 附件选择框 -->
       <div class="attachment-container">
@@ -73,6 +93,10 @@ import {
   IonTitle,
   IonContent,
   IonItem,
+  IonCheckbox,
+  IonDatetimeButton,
+  IonDatetime,
+  IonModal,
   IonAlert,
   alertController,
   IonLabel,
@@ -88,7 +112,7 @@ import { useUserStore } from '@/store/user';
 import {onIonViewWillEnter} from '@ionic/vue';
 import apiClient from '@/services/api';
 import { apiFormDataClient } from '@/services/api';
-import {arrowBackCircleOutline, trashOutline,sendOutline, closeCircleOutline, documentOutline, attachOutline, saveOutline } from 'ionicons/icons';
+import {alarmOutline, arrowBackCircleOutline, trashOutline,sendOutline, closeCircleOutline, documentOutline, attachOutline, saveOutline } from 'ionicons/icons';
 import { useRouter, useRoute } from 'vue-router';
 
 // 定义状态变量
@@ -99,6 +123,23 @@ const attachments = ref<File[]>([]);
 const fileInput = ref<HTMLInputElement | null>(null);
 const isDraft = ref(false);
 const mailId = ref<string | null>(null);
+const scheduledSend = ref(false);
+
+// 定义绑定变量
+const selectedDate = ref<string>(new Date(new Date().getTime() + 8 * 60 * 60 * 1000).toISOString());
+
+const sendTime = ref<string>(''); // 用于存储最终发送的时间
+
+const updateSendTime = (event: any) => {
+  const selectedTime = event.detail.value;
+  if (selectedTime) {
+    const utcTime = new Date(selectedTime); // 选中的时间（UTC 时间）
+    const localTime = new Date(utcTime.getTime() + 8 * 60 * 60 * 1000); // 加上8小时时差
+    const formattedTime = localTime.toISOString().slice(0, 23); // 移除 Z 并保留毫秒部分
+    sendTime.value = formattedTime; // 保存调整后的时间
+    console.log('Formatted sendTime with time difference:', sendTime.value);
+  }
+};
 
 // 定义加载动画状态变量
 const isLoading = ref(false);
@@ -176,6 +217,10 @@ const sendMail = async () => {
   formData.append('toAddress', toAddress.value);
   formData.append('subject', subject.value);
   formData.append('content', content.value);
+
+  if (scheduledSend.value && sendTime.value) {
+    formData.append('sendTime', sendTime.value);
+  }
 
   attachments.value.forEach((file) => {
     formData.append('attachments', file);
@@ -365,7 +410,11 @@ onIonViewWillEnter(async () => {
   color: var(--ion-color-dark);
 }
 
-
+.datetime-container {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* 设置图标和按钮之间的间距 */
+}
 .attachment-list {
   margin-top: 10px;
 }
