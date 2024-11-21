@@ -32,12 +32,16 @@
             <ion-datetime-button datetime="datetime"></ion-datetime-button>
 
             <ion-modal :keep-contents-mounted="true">
-              <ion-datetime id="datetime"></ion-datetime>
-            </ion-modal>
+            <!-- 日期时间选择器 -->
+            <ion-datetime 
+              id="datetime" 
+              v-model="selectedDate" 
+              presentation="date-time" 
+              @ionChange="updateSendTime">
+            </ion-datetime>
+          </ion-modal>
           </div>
-
-          
-      </ion-item>
+        </ion-item>
 
       <!-- 附件选择框 -->
       <div class="attachment-container">
@@ -121,6 +125,22 @@ const isDraft = ref(false);
 const mailId = ref<string | null>(null);
 const scheduledSend = ref(false);
 
+// 定义绑定变量
+const selectedDate = ref<string>(new Date(new Date().getTime() + 8 * 60 * 60 * 1000).toISOString());
+
+const sendTime = ref<string>(''); // 用于存储最终发送的时间
+
+const updateSendTime = (event: any) => {
+  const selectedTime = event.detail.value;
+  if (selectedTime) {
+    const utcTime = new Date(selectedTime); // 选中的时间（UTC 时间）
+    const localTime = new Date(utcTime.getTime() + 8 * 60 * 60 * 1000); // 加上8小时时差
+    const formattedTime = localTime.toISOString().slice(0, 23); // 移除 Z 并保留毫秒部分
+    sendTime.value = formattedTime; // 保存调整后的时间
+    console.log('Formatted sendTime with time difference:', sendTime.value);
+  }
+};
+
 // 定义加载动画状态变量
 const isLoading = ref(false);
 const loadingMessage = ref('正在发送邮件，请稍候...');
@@ -197,6 +217,10 @@ const sendMail = async () => {
   formData.append('toAddress', toAddress.value);
   formData.append('subject', subject.value);
   formData.append('content', content.value);
+
+  if (scheduledSend.value && sendTime.value) {
+    formData.append('sendTime', sendTime.value);
+  }
 
   attachments.value.forEach((file) => {
     formData.append('attachments', file);
